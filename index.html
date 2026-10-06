@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeetCode Daily Problem</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="card" id="app">
+    <p>Loading today's challenge...</p>
+  </div>
+
+  <script>
+    async function loadDailyProblem() {
+  const container = document.getElementById('app');
+  try {
+    const response = await fetch('http://localhost:3001/api/daily');
+    const data = await response.json();
+
+    if (data.error) throw new Error(data.error);
+
+    // Extract the nested question object
+    const q = data.question;
+    const tags = q.topicTags ? q.topicTags.map(t => t.name) : [];
+
+    container.innerHTML = `
+      <span class="date">Daily Challenge — ${data.date}</span>
+      <h1>${q.questionFrontendId}. ${q.title}</h1>
+      <div>
+        <span class="badge ${q.difficulty}">${q.difficulty}</span>
+      </div>
+      <div class="tags">
+        ${tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+      </div>
+      <div class="content">${q.content || '<em>No description available.</em>'}</div>
+      <a class="btn" href="https://leetcode.com${data.link}" target="_blank">Solve on LeetCode →</a>
+    `;
+  } catch (err) {
+    container.innerHTML = `<p style="color: #ff375f;">Failed to load problem: ${err.message}</p>`;
+  }
+}
+    
+
+    loadDailyProblem();
+  </script>
+</body>
+</html>
